@@ -1,7 +1,7 @@
 package com.androiddevs.shoppinglist.ui.shoppinglist
 
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.view.LayoutInflater
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -15,11 +15,18 @@ import com.androiddevs.shoppinglist.data.db.entities.ShoppingItem
 import com.androiddevs.shoppinglist.data.repositories.ShoppingRepository
 import com.androiddevs.shoppinglist.databinding.ActivityShoppingBinding
 import com.androiddevs.shoppinglist.other.ShoppingItemAdapter
+import org.kodein.di.KodeinAware
+import org.kodein.di.android.kodein
+import org.kodein.di.generic.instance
 
-class ShoppingActivity : AppCompatActivity() {
+class ShoppingActivity : AppCompatActivity(), KodeinAware {
+
+    override val kodein by kodein()
+    private val factory: ShoppingViewModelFactory by instance()
 
     private val binding get() = _binding!!
     private var _binding: ActivityShoppingBinding? = null
+    @SuppressLint("NotifyDataSetChanged")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -31,9 +38,6 @@ class ShoppingActivity : AppCompatActivity() {
             insets
         }
 
-        val database = ShoppingDatabase(this)
-        val repository = ShoppingRepository(database)
-        val factory = ShoppingViewModelFactory(repository)
         val viewModel = ViewModelProviders.of(this, factory).get(ShoppingViewModel::class.java)
 
         val adapter = ShoppingItemAdapter(listOf(), viewModel)
